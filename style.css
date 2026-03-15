@@ -1,0 +1,475 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --bg: #fda3a3;
+    --surface: #ffffff;
+    --text: #351c1c;
+    --muted: rgba(24, 25, 26, 0.7);
+    --accent: #ff6b6b;
+    --accent-2: #860e18;
+    --shadow: 0 15px 25px rgba(0, 0, 0, 0.8), 0 25px 45px rgba(0, 0, 0, 0.08);
+    --ring: 0 0 0 4px rgb(255, 255, 255);
+    
+    --clock-size: clamp(240px, 60vw, 360px);
+    --clock-border: clamp(7px, 2vw, 12px);
+    --clock-inset: clamp(14px, 4vw, 20px);
+    --clock-inner-ring: clamp(15px, 4vw, 25px);
+}
+
+body[data-theme="ocean"] {
+    --accent: #2d9cdb;
+    --accent-2: #585ae4;
+    --ring: 0 0 0 4px rgba(45, 156, 219, 0.25);
+}
+
+body[data-theme="forest"] {
+    --accent: #2d531c;
+    --accent-2: #2bff00;
+    --ring: 0 0 0 4px rgba(45, 83, 30, 0.5);
+}
+
+body[data-theme="sunset"] {
+    --accent: #ff6b6b;
+    --accent-2: #291818;
+    --ring: 0 0 0 4px rgba(255, 107, 107, 0.25);
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    background: var(--bg);
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(900px 420px at 15% 10%, rgba(86, 204, 242, 0.30), transparent 60%),
+        radial-gradient(900px 420px at 80% 20%, rgba(45, 156, 219, 0.25), transparent 60%),
+        radial-gradient(900px 420px at 50% 95%, rgba(231, 76, 60, 0.12), transparent 60%);
+    filter: saturate(1.1);
+}
+
+body.dark {
+    --bg: #111213;
+    --surface: #18191a;
+    --text: #e4e6eb;
+    --muted: rgba(255, 255, 255, 0.75);
+    --shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 35px 60px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 30px 20px;
+    width: min(1000px, 100%);
+    animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.topbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-radius: 16px;
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+    padding: 12px 20px;
+}
+
+.readout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 16px;
+    background-color: color-mix(in oklab, var(--surface) 70%, transparent);
+    border: 1px solid color-mix(in oklab, var(--surface) 14%, transparent);
+    border-radius: 10px;
+    min-width: 160px;
+}
+
+.readout_time {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0 2px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.readout_date {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.brand_name { font-weight: 600; }
+.brand_tag { font-size: 12px; color: var(--muted); }
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 14px;
+    background: color-mix(in oklab, var(--surface) 65%, transparent);
+    border: 1px solid color-mix(in oklab, var(--surface) 14%, transparent);
+}
+
+.theme-btn {
+    appearance: none;
+    border: 1px solid transparent;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 160ms ease;
+}
+
+.theme-btn:hover {
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    transform: scale(1.05);
+}
+
+.theme-btn.is-active {
+    background: linear-gradient(134deg, color-mix(in oklab, var(--accent) 88%, white), color-mix(in oklab, var(--accent-2) 88%, white));
+    color: #0b0c0d;
+    font-weight: 600;
+}
+
+/* Wrapper for Clock & Calendar */
+.content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    width: 100%;
+    flex-wrap: wrap; /* Allows stacking on mobile */
+}
+
+/* Clock */
+.clock {
+    display: flex;
+    height: var(--clock-size);
+    width: var(--clock-size);
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in oklab, var(--surface) 88%, transparent);
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    border: var(--clock-border) solid color-mix(in oklab, var(--accent) 55%, var(--text));
+    outline: 2px solid color-mix(in oklab, var(--text) 12%, transparent);
+    outline-offset: 4px;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease !important;
+}
+
+.clock:hover {
+    transform: scale(1.02);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15), 0 35px 65px rgba(0, 0, 0, 0.1); 
+}
+
+.clock::after {
+    content: "";
+    position: absolute;
+    inset: var(--clock-inner-ring);
+    border-radius: 50%;
+    pointer-events: none;
+    border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
+    opacity: 0.9;
+}
+
+.clock label {
+    position: absolute;
+    inset: var(--clock-inset);
+    text-align: center;
+    transform: rotate(calc(var(--i) * (360deg / 12)));
+}
+
+.clock label span {
+    display: inline-block;
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 600;
+    color: var(--text);
+    transform: rotate(calc(var(--i) * (-360deg / 12)));
+}
+
+.indicator {
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.indicator::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    z-index: 100;
+    background: var(--text);
+    border: 3px solid var(--accent);
+}
+
+.indicator .hand {
+    position: absolute;
+    height: calc(var(--clock-size) * 0.325);
+    width: 4px;
+    bottom: 0;
+    border-radius: 25px;
+    transform-origin: bottom;
+    background: var(--accent);
+}
+
+.hand.minute {
+    height: calc(var(--clock-size) * 0.30);
+    width: 5px;
+    background: var(--text);
+}
+
+.hand.hour {
+    height: calc(var(--clock-size) * 0.25);
+    width: 7px;
+    background: var(--text);
+}
+
+/* =========================================
+   CALENDAR STYLES
+   ========================================= */
+.calendar {
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    border-radius: 24px;
+    padding: 24px;
+    width: min(340px, 100%);
+    border: 1px solid color-mix(in oklab, var(--surface) 14%, transparent);
+    transition: transform 0.4s ease, box-shadow 0.5s ease;
+}
+
+.calendar:hover {
+    transform: translateY(-5px);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.calendar-btn {
+    background: color-mix(in oklab, var(--surface) 60%, transparent);
+    border: none;
+    color: var(--text);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.calendar-days div {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.calendar-days div:hover:not(.empty) {
+    background: color-mix(in oklab, var(--surface) 90%, transparent);
+    outline: 2px solid var(--accent);
+}
+
+.calendar-days div.current-date {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 10px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.calendar-days div.empty {
+    cursor: default;
+}
+
+/* Mode Switch */
+.mode-switch {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.mode-switch:active {
+    transform: scale(0.95);
+}
+
+/* Global Transitions & Animations */
+body, .topbar, .readout, .theme-switch, .calendar, .calendar-days div, .clock {
+    transition: background 0.5s ease, background-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
+}
+
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+    .content-wrapper { flex-direction: column; gap: 40px; }
+    .topbar { flex-direction: column; align-items: stretch; gap: 20px; }
+    .controls { justify-content: space-between; width: 100%; }
+    .readout { width: 100%; }
+}
+@media (max-width: 500px) {
+    .controls { flex-direction: column; align-items: stretch; }
+    .mode-switch { text-align: center; }
+}
+
+/* =========================================
+   NOTES STYLES
+   ========================================= */
+.notes-container {
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    border-radius: 24px;
+    padding: 24px;
+    width: min(340px, 100%);
+    border: 1px solid color-mix(in oklab, var(--surface) 14%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.4s ease, box-shadow 0.5s ease;
+}
+
+.notes-container:hover {
+    transform: translateY(-5px);
+}
+
+.notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notes-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#notes-area {
+    width: 100%;
+    height: 180px;
+    resize: none;
+    background: color-mix(in oklab, var(--surface) 40%, transparent);
+    border: 1px solid color-mix(in oklab, var(--text) 20%, transparent);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+#notes-area:focus {
+    border-color: var(--accent);
+    background: color-mix(in oklab, var(--surface) 70%, transparent);
+}
+
+#notes-area::-webkit-scrollbar {
+    width: 8px;
+}
+#notes-area::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+.notes-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#save-status {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    min-height: 18px;
+}
